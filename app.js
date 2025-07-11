@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const helmet = require('helmet');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
@@ -13,6 +14,7 @@ app.use('/webhook', webhookRoutes);
 //Body parsers (after webhook)
 app.use(cors());
 app.use(express.json());
+app.use(helmet());// Use Helmet to set security headers
 app.use(express.urlencoded({ extended: true }));
 
 //Route imports
