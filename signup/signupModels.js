@@ -18,5 +18,11 @@ class UserModel {
         const [results] = await db.query(query, [email_id]);
         return results[0];
     }
+
+  static async findByUsername(username) {
+    const query = 'SELECT * FROM users WHERE username = ?';
+    const [results] = await db.query(query, [username]);
+    return results[0];
+  }
 }
 module.exports = UserModel;
