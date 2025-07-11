@@ -92,9 +92,9 @@ router.get('/', async (req, res) => {
     const result = videos.map(video => ({
       _id: video.id,
       title: video.title || video.filename,
-      videoUrl: `${baseUrl}/${video.path.replace(/\\/g, '/')}`,
+      videoUrl: `${baseUrl}/${encodeURI(video.path.replace(/\\/g, '/'))}`,
       thumbnailUrl: video.thumbnailUrl
-        ? (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${video.thumbnailUrl.replace(/\\/g, '/')}`)
+        ? (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${encodeURI(video.thumbnailUrl.replace(/\\/g, '/'))}`)
         : null,
       description: video.description || ''
     }));
@@ -120,9 +120,9 @@ router.get('/by-category', async (req, res) => {
     const result = videos.map(video => ({
       _id: video.id,
       title: video.title || video.filename,
-      videoUrl: `${baseUrl}/${video.path.replace(/\\/g, '/')}`,
+      videoUrl: `${baseUrl}/${encodeURI(video.path.replace(/\\/g, '/'))}`,
       thumbnailUrl: video.thumbnailUrl
-        ? (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${video.thumbnailUrl.replace(/\\/g, '/')}`)
+        ? (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${encodeURI(video.thumbnailUrl.replace(/\\/g, '/'))}`)
         : null,
       description: video.description || ''
     }));
@@ -148,9 +148,9 @@ router.get('/user-list', authenticate, async (req, res) => {
       return {
         _id: video.id,
         title: video.title || video.filename,
-        videoUrl: `${baseUrl}/${video.path.replace(/\\/g, '/')}`,
+        videoUrl: `${baseUrl}/${encodeURI(video.path.replace(/\\/g, '/'))}`,
         thumbnailUrl: video.thumbnailUrl
-          ? (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${video.thumbnailUrl.replace(/\\/g, '/')}`)
+          ? (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${encodeURI(video.thumbnailUrl.replace(/\\/g, '/'))}`)
           : null,
         description: video.description || '',
         paid: paidSet.has(key),
