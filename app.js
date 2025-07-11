@@ -147,7 +147,7 @@ app.get('/stream/:language/:level/:filename', (req, res) => {
 
 // ====== Root Route ====== //
 app.get('/', (req, res) => {
-  res.send('Render server is active and Permissions-Policy is set.');
+  res.send('Railway server is active and Permissions-Policy is set.');
 });
 
 // ====== Global Error Handler ====== //
