@@ -39,6 +39,7 @@ class SignupController {
                 username,
                 email_id,
                 password,
+                confirm_password,
                 dob,
                 ph_no,
                 address,
