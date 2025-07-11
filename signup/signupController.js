@@ -17,15 +17,21 @@ class SignupController {
         }
 
         try {
-            // Check if username already exists
-            const existingUsername = await UserModel.findByUsername(username);
-            if (existingUsername) {
-                return res.status(409).json({ message: 'Username already exists' });
-            }
+            // Check both username and email
+            const [existingUsername, existingEmail] = await Promise.all([
+                UserModel.findByUsername(username),
+                UserModel.findByEmail(email_id),
+            ]);
 
-            const existingEmail = await UserModel.findByEmail(email_id);
-            if (existingEmail) {
-                return res.status(409).json({ message: 'Email already exists' });
+            // Build custom error message
+            if (existingUsername || existingEmail) {
+                const messages = [];
+                if (existingUsername) messages.push('Username already exists');
+                if (existingEmail) messages.push('Email already exists');
+
+                return res.status(409).json({
+                    message: messages.join(' and ')
+                });
             }
 
             // Create the user
@@ -33,7 +39,6 @@ class SignupController {
                 username,
                 email_id,
                 password,
-                confirm_password,
                 dob,
                 ph_no,
                 address,
