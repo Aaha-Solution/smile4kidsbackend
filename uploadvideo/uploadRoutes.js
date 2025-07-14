@@ -1,9 +1,10 @@
+// videoRoutes.js
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 const VideoModel = require('./videoModel');
-const PaidVideoModel = require('../payment/paidVideoModel'); 
+const PaidVideoModel = require('../payment/paidVideoModel');
 const authenticate = require('../authMiddleware');
 
 const router = express.Router();
@@ -12,7 +13,6 @@ const router = express.Router();
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     let uploadPath;
-
     if (file.fieldname === 'video') {
       uploadPath = path.join(__dirname, '../uploads/videos');
     } else if (file.fieldname === 'thumbnail') {
@@ -20,7 +20,6 @@ const storage = multer.diskStorage({
     } else {
       return cb(new Error('Invalid field name'), null);
     }
-
     fs.mkdirSync(uploadPath, { recursive: true });
     cb(null, uploadPath);
   },
@@ -31,60 +30,49 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-/**
- * POST /videos/upload (Protected)
- */
-router.post(
-  '/upload',
-  authenticate,
-  upload.fields([
-    { name: 'video', maxCount: 1 },
-    { name: 'thumbnail', maxCount: 1 }
-  ]),
-  async (req, res) => {
-    try {
-      const { language, level, title, description } = req.body;
-      const videoFile = req.files?.video?.[0];
-      const thumbnailFile = req.files?.thumbnail?.[0];
+// Upload Video Route (Protected)
+router.post('/upload', authenticate, upload.fields([
+  { name: 'video', maxCount: 1 },
+  { name: 'thumbnail', maxCount: 1 }
+]), async (req, res) => {
+  try {
+    const { language, level, title, description } = req.body;
+    const videoFile = req.files?.video?.[0];
+    const thumbnailFile = req.files?.thumbnail?.[0];
 
-      if (!language || !level || !videoFile) {
-        return res.status(400).json({ message: 'Language, level, and video are required' });
-      }
-
-      const videoPath = path.join('uploads/videos', videoFile.filename);
-      const thumbnailPath = thumbnailFile
-        ? path.join('uploads/thumbnails', thumbnailFile.filename)
-        : null;
-
-      const videoId = await VideoModel.save({
-        filename: videoFile.filename,
-        language,
-        level,
-        path: videoPath,
-        title: title || videoFile.originalname,
-        description: description || '',
-        thumbnailUrl: thumbnailPath
-      });
-
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
-      res.status(200).json({
-        _id: videoId,
-        title: title || videoFile.originalname,
-        videoUrl: `${baseUrl}/${videoPath.replace(/\\/g, '/')}`,
-        thumbnailUrl: thumbnailPath ? `${baseUrl}/${thumbnailPath.replace(/\\/g, '/')}` : null,
-        description: description || ''
-      });
-
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Upload failed', error: err.message });
+    if (!language || !level || !videoFile) {
+      return res.status(400).json({ message: 'Language, level, and video are required' });
     }
-  }
-);
 
-/**
- * GET /videos - All videos
- */
+    const videoPath = path.join('uploads/videos', videoFile.filename);
+    const thumbnailPath = thumbnailFile ? path.join('uploads/thumbnails', thumbnailFile.filename) : null;
+
+    const videoId = await VideoModel.save({
+      filename: videoFile.filename,
+      language,
+      level,
+      path: videoPath,
+      title: title || videoFile.originalname,
+      description: description || '',
+      thumbnailUrl: thumbnailPath
+    });
+
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    res.status(200).json({
+      _id: videoId,
+      title: title || videoFile.originalname,
+      videoUrl: `${baseUrl}/${videoPath.replace(/\\/g, '/')}`,
+      thumbnailUrl: thumbnailPath ? `${baseUrl}/${thumbnailPath.replace(/\\/g, '/')}` : null,
+      description: description || ''
+    });
+
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).json({ message: 'Upload failed', error: err.message });
+  }
+});
+
+// Get All Videos
 router.get('/', async (req, res) => {
   try {
     const videos = await VideoModel.getAll();
@@ -93,9 +81,9 @@ router.get('/', async (req, res) => {
       _id: video.id,
       title: video.title || video.filename,
       videoUrl: `${baseUrl}/${encodeURI(video.path.replace(/\\/g, '/'))}`,
-      thumbnailUrl: video.thumbnailUrl
-        ? (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${encodeURI(video.thumbnailUrl.replace(/\\/g, '/'))}`)
-        : null,
+      thumbnailUrl: video.thumbnailUrl ?
+        (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${encodeURI(video.thumbnailUrl.replace(/\\/g, '/'))}`) :
+        null,
       description: video.description || ''
     }));
     res.json(result);
@@ -104,9 +92,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-/**
- * GET /videos/by-category?language=Gujarati&level=junior
- */
+// Get Videos by Language and Level
 router.get('/by-category', async (req, res) => {
   const { language, level } = req.query;
   if (!language || !level) {
@@ -116,23 +102,22 @@ router.get('/by-category', async (req, res) => {
   try {
     const videos = await VideoModel.getByCategory(language, level);
     const baseUrl = `${req.protocol}://${req.get('host')}`;
-
     const result = videos.map(video => ({
       _id: video.id,
       title: video.title || video.filename,
       videoUrl: `${baseUrl}/${encodeURI(video.path.replace(/\\/g, '/'))}`,
-      thumbnailUrl: video.thumbnailUrl
-        ? (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${encodeURI(video.thumbnailUrl.replace(/\\/g, '/'))}`)
-        : null,
+      thumbnailUrl: video.thumbnailUrl ?
+        (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${encodeURI(video.thumbnailUrl.replace(/\\/g, '/'))}`) :
+        null,
       description: video.description || ''
     }));
-
     res.json(result);
   } catch (err) {
     res.status(500).json({ message: 'Database error', error: err.message });
   }
 });
 
+// Get User's Paid Videos
 router.get('/user-list', authenticate, async (req, res) => {
   try {
     const user_id = req.user?.users_id;
@@ -140,6 +125,7 @@ router.get('/user-list', authenticate, async (req, res) => {
 
     const paid = await PaidVideoModel.getPaidVideos(user_id);
     const paidSet = new Set(paid.map(p => `${p.language}-${p.level}`));
+
     const videos = await VideoModel.getAll();
     const baseUrl = `${req.protocol}://${req.get('host')}`;
 
@@ -149,9 +135,9 @@ router.get('/user-list', authenticate, async (req, res) => {
         _id: video.id,
         title: video.title || video.filename,
         videoUrl: `${baseUrl}/${encodeURI(video.path.replace(/\\/g, '/'))}`,
-        thumbnailUrl: video.thumbnailUrl
-          ? (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${encodeURI(video.thumbnailUrl.replace(/\\/g, '/'))}`)
-          : null,
+        thumbnailUrl: video.thumbnailUrl ?
+          (video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${baseUrl}/${encodeURI(video.thumbnailUrl.replace(/\\/g, '/'))}`) :
+          null,
         description: video.description || '',
         paid: paidSet.has(key),
         language: video.language,
@@ -161,8 +147,11 @@ router.get('/user-list', authenticate, async (req, res) => {
 
     res.json(result);
   } catch (err) {
+    console.error('Fetch user video list error:', err);
     res.status(500).json({ message: 'Error fetching user video list', error: err.message });
   }
 });
 
 module.exports = router;
+
+
