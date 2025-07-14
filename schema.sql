@@ -34,21 +34,7 @@ CREATE TABLE `images` (
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Dumping data for table `images`
---
 
-INSERT INTO `images` (`id`, `path`, `created_at`, `updated_at`) VALUES
-(1, '/assets/images/1749622914064.png', '2025-06-27 05:47:05', '2025-06-27 05:47:05'),
-(2, '/assets/images/1749622929458.png', '2025-06-27 05:47:05', '2025-06-27 05:47:05'),
-(3, '/assets/images/1749622934180.png', '2025-06-27 05:47:05', '2025-06-27 05:47:05'),
-(4, '/assets/images/1749622938374.png', '2025-06-27 05:47:05', '2025-06-27 05:47:05'),
-(5, '/assets/images/1749622943563.png', '2025-06-27 05:47:05', '2025-06-27 05:47:05'),
-(6, '/assets/images/1749622948350.png', '2025-06-27 05:47:05', '2025-06-27 05:47:05'),
-(7, '/assets/images/1749622953080.png', '2025-06-27 05:47:05', '2025-06-27 05:47:05'),
-(8, '/assets/images/1749622957100.png', '2025-06-27 05:47:05', '2025-06-27 05:47:05'),
-(9, '/assets/images/1749622960003.png', '2025-06-27 05:47:05', '2025-06-27 05:47:05'),
-(10, '/assets/images/1749622965295.png', '2025-06-27 05:47:05', '2025-06-27 05:47:05');
 
 -- --------------------------------------------------------
 
@@ -146,10 +132,6 @@ ALTER TABLE `user_paid_videos`
 --
 ALTER TABLE `videos`
   ADD PRIMARY KEY (`id`);
-
---
--- AUTO_INCREMENT for dumped tables
---
 
 --
 -- AUTO_INCREMENT for table `images`

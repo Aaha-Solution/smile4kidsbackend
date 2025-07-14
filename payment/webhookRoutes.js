@@ -7,7 +7,7 @@ const PaidVideoModel = require('./paidVideoModel');
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 router.post('/', (req, res) => {
-  console.log("✅ Webhook hit!");
+  console.log("Webhook hit!");
 
   const sig = req.headers['stripe-signature'];
 
@@ -16,7 +16,7 @@ router.post('/', (req, res) => {
     // req.body is the raw buffer because of bodyParser.raw()
     event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
   } catch (err) {
-    console.error('❌ Webhook signature verification failed:', err.message);
+    console.error('Webhook signature verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -37,10 +37,10 @@ router.post('/', (req, res) => {
         if (sel.language && sel.level) {
           PaidVideoModel.markPaid(user_id, sel.language, sel.level)
             .then(() => {
-              console.log(`✅ Marked paid: User ${user_id}, ${sel.language}-${sel.level}`);
+              console.log(`Marked paid: User ${user_id}, ${sel.language}-${sel.level}`);
             })
             .catch((err) => {
-              console.error('❌ Failed to mark paid:', err);
+              console.error('Failed to mark paid:', err);
             });
         }
       }
@@ -54,10 +54,10 @@ router.post('/', (req, res) => {
       status: paymentIntent.status
     })
     .then(() => {
-      console.log(`✅ Payment saved for session ${paymentIntent.id}`);
+      console.log(`Payment saved for session ${paymentIntent.id}`);
     })
     .catch((saveErr) => {
-      console.error('❌ Failed to save payment to DB:', saveErr);
+      console.error('Failed to save payment to DB:', saveErr);
     });
   }
 

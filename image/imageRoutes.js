@@ -1,23 +1,29 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const ImageModel = require('./imageModel');
 const router = express.Router();
-const authMiddleware = require('../authMiddleware');
 
+// ✅ Ensure assets/images directory exists
+const uploadDir = path.join(__dirname, '../assets/images');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-// Set up storage for Multer
+// ✅ Multer storage config
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'assets/images'); // Save to assets/images folder
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // Unique filename
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
+
 const upload = multer({ storage: storage });
 
-// Get all images
+// ✅ Get all images
 router.get('/', async (req, res) => {
   try {
     const images = await ImageModel.getAll();
@@ -27,7 +33,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get image by id
+// ✅ Get image by id
 router.get('/:id', async (req, res) => {
   try {
     const image = await ImageModel.getById(req.params.id);
@@ -38,11 +44,12 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// API endpoint to upload image
+// ✅ Upload image
 router.post('/upload', upload.single('image'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
   }
+
   const imagePath = `/assets/images/${req.file.filename}`;
   try {
     const image = await ImageModel.save(imagePath);

@@ -7,7 +7,7 @@ const PaidVideoModel = require('./paidVideoModel'); // Add this
 const authMiddleware = require('../authMiddleware');
 
 
-// ✅ Allowed payment types - ensure casing matches frontend
+//Allowed payment types - ensure casing matches frontend
 const PAYMENT_TYPES = [
   'Hindi-Junior',
   'Hindi-Pre_Junior',
@@ -69,7 +69,7 @@ router.post('/create-payment-intent', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Stripe paymentIntent error:', error);
+    console.error('Stripe paymentIntent error:', error);
     res.status(500).json({
       message: 'Payment failed',
       error: error.message,

@@ -12,10 +12,10 @@ module.exports = async function authenticate(req, res, next) {
 
     const token = authHeader.split(' ')[1];
 
-    // 🔍 Verify JWT
+    //Verify JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // 🔎 Check if user exists in DB
+    //Check if user exists in DB
     const [rows] = await db.query('SELECT * FROM users WHERE users_id = ?', [decoded.users_id]);
 
     if (!rows.length) {
