@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config(); 
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -6,12 +6,12 @@ const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
 const mysql = require('mysql2/promise');
+const bodyParser = require('body-parser');
 
 const app = express();
 
 // ====== Security Headers Setup ====== //
-app.use(helmet()); // Helmet sets most headers like HSTS, CSP, X-Content-Type-Options, etc.
-
+app.use(helmet());
 app.use((req, res, next) => {
   res.setHeader(
     'Permissions-Policy',
@@ -20,18 +20,20 @@ app.use((req, res, next) => {
   next();
 });
 
-// ====== CORS and Body Parsers ====== //
+// ====== CORS ====== //
 app.use(cors());
+
+// ====== Webhook (Stripe) - Must come BEFORE express.json ====== //
+app.use('/webhook', bodyParser.raw({ type: 'application/json' }));
+app.use('/webhook', require('./payment/webhookRoutes'));
+
+// ====== Body Parsers for all other routes ====== //
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ====== Static Files ====== //
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/assets/images', express.static(path.join(__dirname, 'assets/images')));
-
-// ====== Webhook (must come before body parser) ====== //
-const webhookRoutes = require('./payment/webhookRoutes');
-app.use('/webhook', webhookRoutes);
 
 // ====== Route Imports ====== //
 const signupRoutes = require('./signup/signupRoutes');
@@ -57,7 +59,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// ====== Log JSON Responses ====== //
 app.use((req, res, next) => {
   const oldJson = res.json;
   res.json = function (data) {
@@ -67,7 +68,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// ====== Timing Logs ====== //
 app.use((req, res, next) => {
   req._startTime = Date.now();
   res.on('finish', () => {

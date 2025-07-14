@@ -6,8 +6,8 @@ const PaymentModel = require('./paymentModel');
 const PaidVideoModel = require('./paidVideoModel');
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-router.post('/', express.raw({ type: 'application/json' }), async (req, res) => {
-  console.log("Webhook hit!");
+router.post('/', async (req, res) => {
+  console.log("✅ Webhook hit!");
 
   const sig = req.headers['stripe-signature'];
   let event;
@@ -15,7 +15,7 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
   } catch (err) {
-    console.error('Webhook signature verification failed:', err.message);
+    console.error('❌ Webhook signature verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -35,8 +35,9 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
         if (sel.language && sel.level) {
           try {
             await PaidVideoModel.markPaid(user_id, sel.language, sel.level);
+            console.log(`✅ Marked paid: User ${user_id}, ${sel.language}-${sel.level}`);
           } catch (err) {
-            console.error('Failed to mark paid:', err);
+            console.error('❌ Failed to mark paid:', err);
           }
         }
       }
@@ -50,8 +51,9 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
         course_type: paymentIntent.metadata.courseType || null,
         status: paymentIntent.status
       });
+      console.log(`✅ Payment saved for session ${paymentIntent.id}`);
     } catch (saveErr) {
-      console.error('Failed to save payment to DB:', saveErr);
+      console.error('❌ Failed to save payment to DB:', saveErr);
     }
   }
 
