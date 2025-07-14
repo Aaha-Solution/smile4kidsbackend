@@ -22,37 +22,28 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// Get all images (plain format)
+// Get all images
 router.get('/', async (req, res) => {
   try {
-    const images = await ImageModel.getAll();
-
-    // Convert each image to plain object
-    const cleanImages = images.map(image =>
-      typeof image.get === 'function' ? image.get({ plain: true }) : image
-    );
-
-    res.json(cleanImages);
+    const images = await ImageModel.getAll(); // Already plain objects like { id, path }
+    res.json(images);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Get image by ID (plain format)
+// Get image by ID
 router.get('/:id', async (req, res) => {
   try {
     const image = await ImageModel.getById(req.params.id);
     if (!image) return res.status(404).json({ error: 'Image not found' });
-
-    const cleanImage = typeof image.get === 'function' ? image.get({ plain: true }) : image;
-
-    res.json(cleanImage);
+    res.json(image);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Upload image (returns path only, no Buffer)
+// Upload image
 router.post('/upload', upload.single('image'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
@@ -60,11 +51,8 @@ router.post('/upload', upload.single('image'), async (req, res) => {
 
   const imagePath = `/assets/images/${req.file.filename}`;
   try {
-    const savedImage = await ImageModel.save(imagePath);
-
-    const cleanImage = typeof savedImage.get === 'function' ? savedImage.get({ plain: true }) : savedImage;
-
-    res.json({ message: 'Image uploaded successfully', image: cleanImage });
+    const savedImage = await ImageModel.save(imagePath); // Should return { id, path }
+    res.json({ message: 'Image uploaded successfully', image: savedImage });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
