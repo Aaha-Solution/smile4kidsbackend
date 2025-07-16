@@ -1,8 +1,9 @@
-const db = require('../db'); // or wherever your db connection is
+const db = require('../db');
 
 const PaymentModel = {
   save: async (payment) => {
     const {
+      user_id,                
       stripe_session_id,
       amount,
       currency,
@@ -11,12 +12,13 @@ const PaymentModel = {
     } = payment;
 
     const query = `
-      INSERT INTO payments (stripe_session_id, amount, currency, course_type, status)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO payments (user_id, stripe_session_id, amount, currency, course_type, status)
+      VALUES (?, ?, ?, ?, ?, ?)
     `;
-    const values = [stripe_session_id, amount, currency, course_type, status];
+    const values = [user_id, stripe_session_id, amount, currency, course_type, status];
 
-    return db.query(query, values);
+    const [result] = await db.query(query, values);
+    return { id: result.insertId };
   }
 };
 
