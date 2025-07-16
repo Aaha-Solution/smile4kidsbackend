@@ -13,20 +13,22 @@ class ForgotController {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       await ForgotModel.saveOTP(email_id, otp);
 
-      // Send OTP via email
+      // Create SMTP transporter for webmail
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smile4kids.co.uk',
+        port: 465,
+        secure: true, // true for port 465
         auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS
+          user: 'safrina@smile4kids.co.uk',
+          pass: 'Monday@123'
         }
       });
 
       await transporter.sendMail({
-        from: process.env.EMAIL_USER,
+        from: '"Smile4Kids Support" <safrina@smile4kids.co.uk>',
         to: email_id,
         subject: 'Your OTP Code',
-        text: `Your OTP code is: ${otp}`
+        text: `Your OTP is: ${otp}. Use this code to reset your Smile4Kids Mobile App password.`
       });
 
       res.json({ message: 'OTP sent to your email' });
