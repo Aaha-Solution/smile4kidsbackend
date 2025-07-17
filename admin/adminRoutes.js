@@ -12,21 +12,14 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-// Route: Get users with purchases + latest payment info
+//Route: Get users with purchases + latest payment info
 router.get('/users-with-purchases', authMiddleware, requireAdmin, async (req, res) => {
   try {
     const [rows] = await db.query(`
       SELECT 
-        u.users_id,
-        u.username,
-        u.email_id,
-        u.avatar,
-        up.language,
-        up.level,
-        p.amount,
-        p.currency,
-        p.course_type,
-        p.created_at AS last_payment_date
+        u.users_id, u.username, u.email_id, u.avatar,
+        up.language, up.level,
+        p.amount, p.currency, p.course_type, p.created_at AS last_payment_date
       FROM users u
       JOIN user_paid_videos up ON u.users_id = up.user_id
       LEFT JOIN (
@@ -41,12 +34,10 @@ router.get('/users-with-purchases', authMiddleware, requireAdmin, async (req, re
       ORDER BY u.users_id DESC
     `);
 
-    return res.status(200).json(rows);
+    res.json(rows);
   } catch (err) {
-    return res.status(500).json({
-      message: 'Database error occurred while fetching user purchases.',
-      error: 'INTERNAL_SERVER_ERROR',
-    });
+    console.error('DB Error:', err);
+    res.status(500).json({ message: 'Database error', error: err.message });
   }
 });
 
