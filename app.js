@@ -53,30 +53,6 @@ app.use('/api/images', imageRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/admin', adminRoutes);
 
-// ====== Logging Middleware ====== //
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-  next();
-});
-
-app.use((req, res, next) => {
-  const oldJson = res.json;
-  res.json = function (data) {
-    console.log('Response data:', data);
-    oldJson.call(this, data);
-  };
-  next();
-});
-
-app.use((req, res, next) => {
-  req._startTime = Date.now();
-  res.on('finish', () => {
-    const duration = Date.now() - req._startTime;
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration}ms`);
-  });
-  next();
-});
-
 // ====== MySQL Pool Setup ====== //
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
@@ -140,7 +116,6 @@ app.get('/stream/:language/:level/:filename', (req, res) => {
       fs.createReadStream(filePath).pipe(res);
     }
   } catch (err) {
-    console.error(err);
     res.status(404).json({ error: 'Video not found' });
   }
 });
@@ -152,12 +127,11 @@ app.get('/', (req, res) => {
 
 // ====== Global Error Handler ====== //
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
   res.status(500).json({ message: 'Internal server error', error: err.message });
 });
 
 // ====== Start Server ====== //
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.info(`Server running on port ${PORT}`);
 });

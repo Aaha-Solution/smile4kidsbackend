@@ -3,7 +3,9 @@ const db = require('../db');
 class VideoModel {
   static async save({ filename, language, level, path, title, description, thumbnailUrl }) {
     const [results] = await db.query(
-      'INSERT INTO videos (filename, language, level, path, title, description, thumbnailUrl) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      `INSERT INTO videos 
+        (filename, language, level, path, title, description, thumbnailUrl) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [filename, language, level, path, title, description, thumbnailUrl]
     );
     return results.insertId;

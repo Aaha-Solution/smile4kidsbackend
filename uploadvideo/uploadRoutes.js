@@ -1,4 +1,3 @@
-// videoRoutes.js
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -67,7 +66,7 @@ router.post('/upload', authenticate, upload.fields([
     });
 
   } catch (err) {
-    console.error('Upload error:', err);
+    // Optionally log error to a monitoring system here
     res.status(500).json({ message: 'Upload failed', error: err.message });
   }
 });
@@ -147,11 +146,8 @@ router.get('/user-list', authenticate, async (req, res) => {
 
     res.json(result);
   } catch (err) {
-    console.error('Fetch user video list error:', err);
     res.status(500).json({ message: 'Error fetching user video list', error: err.message });
   }
 });
 
 module.exports = router;
-
-

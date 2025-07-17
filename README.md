@@ -1,108 +1,135 @@
-# Smil4kids_MobileBackend
+# Smile4Kids Mobile Backend
 
-A Node.js backend for Smile4Kids mobile app, supporting user authentication, video/image upload (Cloudinary-ready), and password management.
+A Node.js backend for the Smile4Kids mobile app, supporting user authentication, video/image upload, payment integration (Stripe), and password management.
+
+---
+
+## Features
+
+- User registration and login (JWT-based)
+- Password reset via OTP (email)
+- User profile management
+- Video upload, listing, and streaming
+- Image upload and listing
+- Stripe payment integration for paid video access
+- Admin endpoints for user purchase management
 
 ---
 
 ## Installation
 
 1. **Clone the repository:**
-   ```
+   ```sh
    git clone <repository-url>
    ```
 2. **Navigate to the project directory:**
-   ```
-   cd Smil4kids_MobileBackend
+   ```sh
+   cd smile4kidsbackend
    ```
 3. **Install dependencies:**
-   ```
+   ```sh
    npm install
    ```
-
 4. **Set up environment variables:**  
-   Create a `.env` file in the root directory with your database and email credentials. Example:
+   Create a `.env` file in the root directory with your credentials:
    ```
-   DB_HOST=localhost
-   DB_USER=root
-   DB_PASSWORD=
-   DB_NAME=mobile_backend
+   DB_HOST=your_db_host
+   DB_USER=your_db_user
+   DB_PASSWORD=your_db_password
+   DB_NAME=your_db_name
    DB_PORT=3306
 
-   EMAIL_USER=your_email@gmail.com
+   EMAIL_USER=your_email
    EMAIL_PASS=your_email_password
+   EMAIL_HOST=your_email_host
 
    JWT_SECRET=your_jwt_secret
-   ```
 
-5. **(Optional) Configure Cloudinary:**  
-   If using Cloudinary for uploads, create `cloudinaryConfig.js` and add your credentials.
+   STRIPE_SECRET_KEY=your_stripe_secret
+   STRIPE_PUBLISHABLE_KEY=your_stripe_publishable
+   STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+   ```
 
 ---
 
 ## Database Setup
 
-To initialize the database and tables, run:
-```
-node setup.js
-```
+1. Create a MySQL database.
+2. Run the schema in [`schema.sql`](schema.sql) to create tables.
+3. (Optional) Run `node setup.js` if you have a setup script.
 
 ---
 
 ## Usage
 
-To start the application, run:
-```
+Start the server:
+```sh
 node app.js
 ```
-The application will be running on [http://localhost:3000](http://localhost:3000).
+The app will run on [http://localhost:3000](http://localhost:3000).
 
 ---
 
 ## API Endpoints
 
-### **Authentication**
-- **POST /signup**: Register a new user
-- **POST /login**: Login with email and password
+### Authentication
+- `POST /signup` — Register a new user
+- `POST /login` — Login with email and password
 
-### **Forgot Password**
-- **POST /forgot/send-otp**: Send OTP to email
-- **POST /forgot/verify-otp**: Verify OTP
-- **POST /forgot/reset-password**: Reset password
-- **POST /forgot/change-password**: Change password (authenticated)
+### Forgot Password
+- `POST /forgot/send-otp` — Send OTP to email
+- `POST /forgot/verify-otp` — Verify OTP
+- `POST /forgot/reset-password` — Reset password
+- `POST /forgot/change-password` — Change password (authenticated)
 
-### **User Profile**
-- **POST /signup/update-profile**: Update user profile
-- **GET /signup/profile?email_id=...**: Get user profile
+### User Profile
+- `POST /signup/update-profile` — Update user profile
+- `GET /signup/profile?email_id=...` — Get user profile
 
-### **Videos**
-- **POST /videos/upload**: Upload a video and thumbnail (supports Cloudinary)
-- **GET /videos/list**: Get all videos
-- **GET /videos/by-category?language=...&level=...**: Get videos by language and level
-- **GET /videos/list/:language/:level**: Get videos by language/level (e.g., `/videos/list/gujarati/junior`)
+### Videos
+- `POST /videos/upload` — Upload a video and thumbnail (JWT required)
+- `GET /videos` — Get all videos
+- `GET /videos/by-category?language=...&level=...` — Get videos by language and level
+- `GET /videos/user-list` — Get all videos with paid/free status for the logged-in user (JWT required)
+- `GET /stream/:language/:level/:filename` — Stream a video file
 
-### **Images**
-- **POST /api/images/upload**: Upload an image
-- **GET /api/images**: Get all images
+### Images
+- `POST /api/images/upload` — Upload an image
+- `GET /api/images` — Get all images
+- `GET /api/images/:id` — Get image by ID
+
+### Payments
+- `POST /payment/create-payment-intent` — Create Stripe payment intent
+- `POST /payment/calculate-amount` — Calculate total amount for selected courses
+- `GET /payment/my-paid-videos` — Get all paid video categories for the logged-in user (JWT required)
+
+### Admin
+- `GET /admin/users-with-purchases` — Get users with purchases and latest payment info (JWT + admin required)
 
 ---
 
 ## Testing APIs
 
-You can use [Insomnia](https://insomnia.rest/) or [Postman](https://www.postman.com/) to test the API endpoints.  
-A ready-to-import Insomnia collection is provided as `insomnia_collection.json`.
+- Use [Insomnia](https://insomnia.rest/) or [Postman](https://www.postman.com/) to test endpoints.
+- A ready-to-import Insomnia collection is provided as [`insomnia_collection.json`](insomnia_collection.json).
 
 ---
 
-## Contributing
+## File Structure
 
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Make your changes and commit them (`git commit -m 'Add new feature'`).
-4. Push to the branch (`git push origin feature-branch`).
-5. Create a new Pull Request.
+- [`app.js`](app.js): Main server file
+- [`db.js`](db.js): MySQL connection pool
+- [`authMiddleware.js`](authMiddleware.js): JWT authentication middleware
+- [`signup/`](signup/): Signup and profile logic
+- [`login/`](login/): Login logic
+- [`forgot/`](forgot/): Password reset logic
+- [`uploadvideo/`](uploadvideo/): Video upload and listing
+- [`image/`](image/): Image upload and listing
+- [`payment/`](payment/): Payment and paid video logic
+- [`admin/`](admin/): Admin endpoints
 
 ---
 
 ## License
 
-This project is licensed under the MIT License.
+MIT License

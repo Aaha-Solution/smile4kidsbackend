@@ -1,21 +1,28 @@
 const LoginModel = require('./loginModels');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const PaidVideoModel = require('../payment/paidVideoModel');
 
 class LoginController {
   async login(req, res) {
     const { email_id, password } = req.body;
+
     if (!email_id || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
     try {
       const user = await LoginModel.findByEmail(email_id);
-      if (!user || user.password !== password) {
+      if (!user) {
         return res.status(401).json({ message: 'Invalid email or password' });
       }
 
-      // Fetch paid language/level for this user
+      // Compare hashed password
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid email or password' });
+      }
+
       const paidVideos = await PaidVideoModel.getPaidVideos(user.users_id);
 
       const token = jwt.sign(
@@ -26,11 +33,13 @@ class LoginController {
           avatar: user.avatar,
           level: user.level,
           language: user.language,
-          is_admin: user.is_admin 
+          is_admin: user.is_admin
         },
-        process.env.JWT_SECRET
+        process.env.JWT_SECRET,
+        { expiresIn: '7d' }
       );
-      res.json({
+
+      return res.status(200).json({
         message: 'Login successful',
         token,
         user: {
@@ -40,15 +49,14 @@ class LoginController {
           avatar: user.avatar,
           level: user.level,
           language: user.language,
-          is_admin: user.is_admin, 
-          paid_categories: paidVideos // Include paid categories in the response
+          is_admin: user.is_admin,
+          paid_categories: paidVideos
         }
       });
-    } catch (err) {
-      res.status(500).json({ message: 'Database error', error: err.message });
+    } catch {
+      return res.status(500).json({ message: 'Internal server error. Please try again later.' });
     }
   }
 }
 
 module.exports = new LoginController();
-

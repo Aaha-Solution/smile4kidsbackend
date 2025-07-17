@@ -110,22 +110,34 @@
       "body": {
         "mimeType": "multipart/form-data",
         "params": [
-          { "name": "video", "type": "file", "fileName": "/path/to/your/video.mp4" },
-          { "name": "thumbnail", "type": "file", "fileName": "/path/to/your/thumbnail.png" },
-          { "name": "language", "value": "Gujarati" },
-          { "name": "level", "value": "Junior" },
-          { "name": "title", "value": "Colors Gujarati" },
-          { "name": "description", "value": "Gujarati Junior - learning video" }
+          {
+            "name": "video",
+            "type": "file",
+            "fileName": "/path/to/your/video.mp4"
+          },
+          {
+            "name": "thumbnail",
+            "type": "file",
+            "fileName": "/path/to/your/thumbnail.png"
+          },
+          {
+            "name": "language",
+            "value": "Gujarati"
+          },
+          {
+            "name": "level",
+            "value": "Junior"
+          },
+          {
+            "name": "title",
+            "value": "Colors Gujarati"
+          },
+          {
+            "name": "description",
+            "value": "Gujarati Junior - learning video"
+          }
         ]
       },
-      "_type": "request"
-    },
-    {
-      "_id": "req_video_list_all",
-      "parentId": "wrk_smil4kids",
-      "name": "Get All Videos",
-      "method": "GET",
-      "url": "http://localhost:3000/videos/list",
       "_type": "request"
     },
     {
@@ -137,22 +149,6 @@
       "_type": "request"
     },
     {
-      "_id": "req_video_list_gujarati_junior",
-      "parentId": "wrk_smil4kids",
-      "name": "Gujarati Junior Videos",
-      "method": "GET",
-      "url": "http://localhost:3000/videos/list/gujarati/junior",
-      "_type": "request"
-    },
-    {
-      "_id": "req_video_list_panjabi_junior",
-      "parentId": "wrk_smil4kids",
-      "name": "Panjabi Junior Videos",
-      "method": "GET",
-      "url": "http://localhost:3000/videos/list/panjabi/junior",
-      "_type": "request"
-    },
-    {
       "_id": "req_image_upload",
       "parentId": "wrk_smil4kids",
       "name": "Image Upload",
@@ -161,7 +157,11 @@
       "body": {
         "mimeType": "multipart/form-data",
         "params": [
-          { "name": "image", "type": "file", "fileName": "/path/to/your/image.png" }
+          {
+            "name": "image",
+            "type": "file",
+            "fileName": "/path/to/your/image.png"
+          }
         ]
       },
       "_type": "request"
@@ -193,7 +193,10 @@
       "method": "GET",
       "url": "http://localhost:3000/videos/user-list",
       "headers": [
-        { "name": "Authorization", "value": "Bearer {your_token_here}" }
+        {
+          "name": "Authorization",
+          "value": "Bearer {your_token_here}"
+        }
       ],
       "_type": "request"
     }
