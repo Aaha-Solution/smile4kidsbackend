@@ -16,7 +16,7 @@ router.post('/', (req, res) => {
     // req.body is the raw buffer because of bodyParser.raw()
     event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
   } catch (err) {
-    //console.error('Webhook signature verification failed:', err.message);
+    console.error('Webhook signature verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
