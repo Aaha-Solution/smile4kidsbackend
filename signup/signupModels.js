@@ -12,11 +12,11 @@ class UserModel {
     }
 
     // Update profile info
-    static async updateProfile({ email_id, dob, ph_no, address, avatar }) {
+    static async updateProfile({ email_id, username, dob, ph_no, address, avatar }) {
         const query = `
-      UPDATE users SET dob = ?, ph_no = ?, address = ?, avatar = ? WHERE email_id = ?
+      UPDATE users SET username = ?, dob = ?, ph_no = ?, address = ?, avatar = ? WHERE email_id = ?
     `;
-        const [results] = await db.query(query, [dob, ph_no, address, avatar, email_id]);
+        const [results] = await db.query(query, [username, dob, ph_no, address, avatar, email_id]);
         return results;
     }
 
