@@ -17,8 +17,14 @@ class LoginController {
         return res.status(401).json({ message: 'Invalid email or password' });
       }
 
-      // Compare hashed password
-      const isMatch = await bcrypt.compare(password, user.password);
+      // Compare hashed password, fallback to plain text for legacy users
+      let isMatch = false;
+      try {
+        isMatch = await bcrypt.compare(password, user.password);
+      } catch {}
+      if (!isMatch && password === user.password) {
+        isMatch = true; // fallback for plain text
+      }
       if (!isMatch) {
         return res.status(401).json({ message: 'Invalid email or password' });
       }
